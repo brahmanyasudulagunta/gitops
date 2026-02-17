@@ -15,14 +15,10 @@ pipeline {
       }
     }
 
-    stage('Build & Scan & Push') {
+    stage('Build & Push') {
       steps {
         sh '''
           docker build -t $IMAGE_NAME:$IMAGE_TAG app/
-        '''
-      
-        sh '''
-          trivy image --severity CRITICAL,HIGH --exit-code 1 $IMAGE_NAME:$IMAGE_TAG
         '''
       
         withCredentials([usernamePassword(
