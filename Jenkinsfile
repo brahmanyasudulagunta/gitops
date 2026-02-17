@@ -50,7 +50,7 @@ pipeline {
 
          rm -rf gitops-prod
          git clone https://${GIT_USER}:${GIT_PASS}@github.com/brahmanyasudulagunta/gitops-prod.git
-         cd gitops-prod/environments/dev
+         cd gitops-prod/environments/develop
  
          sed -i "s|image:.*|image: ashrith2727/gitops:${BUILD_NUMBER}|" canary.yaml
          git config user.email "jenkins@ci.local"
