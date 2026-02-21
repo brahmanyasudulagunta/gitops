@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 
 app.get("/", (req, res) => {
-  res.json({ status: "OK", service: "gitops-demo-app" });
+  res.json({ status: "OK", service: "gitops" });
 });
 
 app.get("/health", (req, res) => {
