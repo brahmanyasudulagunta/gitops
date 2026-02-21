@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitOps 3-Repo Platform</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="background-grid"></div>
+    <div class="glow-orb top-left"></div>
+    <div class="glow-orb bottom-right"></div>
+
+    <main class="container">
+        <header class="header">
+            <div class="badge">Live Demo Active</div>
+            <h1>Enterprise GitOps Platform</h1>
+            <p>Welcome to the showcase application. This dashboard demonstrates the production-grade, 3-repository CI/CD
+                architecture running your code right now.</p>
+        </header>
+
+        <section class="status-panel glass">
+            <h2>System Status</h2>
+            <div class="status-grid" id="statusGrid">
+                <div class="status-card">
+                    <span class="label">Environment</span>
+                    <span class="value loading" id="envValue">Loading...</span>
+                </div>
+                <div class="status-card">
+                    <span class="label">Pod ID</span>
+                    <span class="value loading" id="podValue">Loading...</span>
+                </div>
+                <div class="status-card">
+                    <span class="label">Health</span>
+                    <span class="value success">Healthy</span>
+                </div>
+                <div class="status-card">
+                    <span class="label">Service</span>
+                    <span class="value loading" id="serviceValue">Loading...</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="architecture-diagram glass">
+            <h2>How This Page Reached You</h2>
+            <div class="repo-flow">
+
+                <div class="repo-card infra">
+                    <div class="icon-wrapper">🏗️</div>
+                    <h3>1. DevPlatform</h3>
+                    <p class="role">The Foundation</p>
+                    <ul>
+                        <li>Provisions Namespaces</li>
+                        <li>Configures RBAC</li>
+                        <li>Sets Quotas & Policies</li>
+                    </ul>
+                    <div class="status-pill">Terraform + Ansible</div>
+                </div>
+
+                <div class="arrow">→</div>
+
+                <div class="repo-card app">
+                    <div class="icon-wrapper">💻</div>
+                    <h3>2. GitOps (Code)</h3>
+                    <p class="role">The Engine</p>
+                    <ul>
+                        <li>Source Code (This UI)</li>
+                        <li>Automated Testing</li>
+                        <li>Trivy Security Scans</li>
+                    </ul>
+                    <div class="status-pill">Jenkins CI Pipeline</div>
+                </div>
+
+                <div class="arrow">→</div>
+
+                <div class="repo-card cd">
+                    <div class="icon-wrapper">🚀</div>
+                    <h3>3. GitOps-Prod</h3>
+                    <p class="role">The Delivery</p>
+                    <ul>
+                        <li>Canary Deployments</li>
+                        <li>Environment Promotion</li>
+                        <li>Immutable Manifests</li>
+                    </ul>
+                    <div class="status-pill">ArgoCD Sync</div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Fetch live pod data
+        async function fetchSystemData() {
+            try {
+                const response = await fetch('/api/info');
+                const data = await response.json();
+
+                document.getElementById('envValue').textContent = data.environment.toUpperCase();
+                document.getElementById('envValue').className = `value env-${data.environment.toLowerCase()}`;
+
+                document.getElementById('podValue').textContent = data.pod;
+                document.getElementById('podValue').classList.remove('loading');
+
+                document.getElementById('serviceValue').textContent = data.service;
+                document.getElementById('serviceValue').classList.remove('loading');
+            } catch (error) {
+                console.error("Failed to fetch system data:", error);
+                document.getElementById('envValue').textContent = "DISCONNECTED";
+                document.getElementById('envValue').className = "value error";
+            }
+        }
+
+        // Initialize
+        fetchSystemData();
+        // Refresh every 5 seconds to show pod changes during canary deployments
+        setInterval(fetchSystemData, 5000);
+    </script>
+</body>
+
+</html>

@@ -2,7 +2,7 @@ FROM node:18-alpine
 
 WORKDIR /app
 COPY package.json .
-RUN npm install --only=production
+RUN yarn install --production
 
 COPY app.js .
 
