@@ -1,36 +1,39 @@
-# gitops
+# Platform Control Plane
 
-Application source code and CI pipeline for the **gitops-demo** application. This repo handles building, scanning, and publishing container images.
+Internal Developer Platform for managing infrastructure requests with an approval-based GitOps workflow.
 
-[![Jenkins](https://img.shields.io/badge/CI-Jenkins-D24939?logo=jenkins&logoColor=white)](https://jenkins.io)
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![React](https://img.shields.io/badge/Frontend-React-61DAFB?logo=react&logoColor=black)](https://react.dev)
+[![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-4169E1?logo=postgresql&logoColor=white)](https://postgresql.org)
 [![Docker](https://img.shields.io/badge/Container-Docker-2496ED?logo=docker&logoColor=white)](https://docker.com)
-[![Node.js](https://img.shields.io/badge/Runtime-Node.js-339933?logo=node.js&logoColor=white)](https://nodejs.org)
+
+---
+
+## Architecture
+
+```
+User → React UI → FastAPI → PostgreSQL → Admin Reviews → Manual Git Commit → Terraform/ArgoCD
+```
+
+This platform follows an **approval-based GitOps** pattern:
+
+1. Users submit infrastructure requests (namespaces, ArgoCD apps) via the UI
+2. Requests are stored in PostgreSQL with `PENDING` status
+3. Admins review and approve/reject requests from the Admin Dashboard
+4. Approved requests are manually committed to Git by the admin
+5. GitOps pipelines (Terraform, ArgoCD) apply the changes automatically
+
+> **Why no auto-push to Git?** This design removes Git credentials from the backend, eliminates token management and push errors, and ensures human approval before infrastructure changes — matching enterprise governance standards.
 
 ---
 
 ## Role in the Platform
 
-This is the **application development layer** of a three-repo architecture:
-
 | Repository | Role | Tools |
 |------------|------|-------|
 | [DevPlatform](https://github.com/brahmanyasudulagunta/DevPlatform) | Infrastructure provisioning & security | Terraform, Ansible, RBAC |
-| **gitops** (this) | Application development & CI | Node.js, Docker, Jenkins |
+| **gitops** (this) | Platform Control Plane (UI + API) | FastAPI, React, PostgreSQL |
 | [gitops-prod](https://github.com/brahmanyasudulagunta/gitops-prod) | Deployment manifests (GitOps) | Kubernetes manifests, ArgoCD |
-
-### How It Connects
-
-```
-Code push to this repo
-    ↓
-Jenkins CI builds & scans Docker image
-    ↓
-Image pushed to DockerHub (ashrith2727/gitops:<BUILD_NUMBER>)
-    ↓
-Jenkins auto-updates gitops-prod/environments/develop/canary.yaml
-    ↓
-ArgoCD detects the change and syncs to Kubernetes
-```
 
 ---
 
@@ -38,77 +41,106 @@ ArgoCD detects the change and syncs to Kubernetes
 
 ```
 gitops/
-├── app/
-│   ├── app.js             # Express.js application (port 3000)
-│   ├── package.json       # Dependencies (Express)
-│   └── Dockerfile         # Node 18 Alpine image
-├── Jenkinsfile            # CI pipeline
+├── backend/
+│   ├── api/
+│   │   ├── auth.py           # Register, Login, JWT
+│   │   ├── admin.py          # List, Approve, Reject requests
+│   │   ├── devplatform.py    # Submit namespace requests
+│   │   └── argocd.py         # Submit ArgoCD app requests
+│   ├── models/
+│   │   ├── user.py           # User model (username, role)
+│   │   ├── request.py        # InfraRequest model
+│   │   └── schemas.py        # Pydantic schemas
+│   ├── utils/
+│   │   ├── auth.py           # JWT middleware, role guards
+│   │   └── validators.py     # K8s name & image validation
+│   ├── database.py           # SQLAlchemy engine & session
+│   ├── config.py             # Environment configuration
+│   ├── main.py               # FastAPI app entry point
+│   ├── requirements.txt
+│   └── Dockerfile
+├── frontend/
+│   ├── src/
+│   │   ├── pages/
+│   │   │   ├── Login.jsx          # Login page
+│   │   │   ├── Register.jsx       # Signup page
+│   │   │   ├── Dashboard.jsx      # User request tracker
+│   │   │   ├── DevPlatform.jsx    # Namespace request form
+│   │   │   ├── ArgoCD.jsx         # ArgoCD app request form
+│   │   │   ├── AdminDashboard.jsx # Admin request management
+│   │   │   └── RequestDetail.jsx  # Request detail + approve/reject
+│   │   ├── context/
+│   │   │   └── AuthContext.jsx    # JWT auth state
+│   │   ├── components/
+│   │   │   ├── Layout.jsx         # Nav bar with role-based links
+│   │   │   └── ProtectedRoute.jsx # Route guard
+│   │   └── services/
+│   │       └── api.js             # API client with auth headers
+│   ├── nginx.conf                 # Reverse proxy to backend
+│   └── Dockerfile
+├── docker-compose.yml             # PostgreSQL + Backend + Frontend
 └── README.md
 ```
 
 ---
 
-## Application
+## API Endpoints
 
-A Node.js Express application with two endpoints:
+### Auth (Public)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/auth/register` | Create new user account |
+| `POST` | `/auth/login` | Login, returns JWT token |
+| `GET` | `/auth/me` | Get current user info |
 
-| Endpoint | Response | Purpose |
-|----------|----------|---------|
-| `GET /` | `{ "status": "OK", "service": "gitops-demo-app" }` | Main endpoint |
-| `GET /health` | `healthy` (200) | Health check for Kubernetes probes |
+### User (Requires Auth)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/devplatform/namespace` | Submit namespace request |
+| `POST` | `/argocd/application` | Submit ArgoCD app request |
+| `GET` | `/devplatform/my-requests` | View own requests |
 
-- **Port:** 3000
-- **Image:** `node:18-alpine`
-- **Registry:** DockerHub → `ashrith2727/gitops:<tag>`
-
----
-
-## CI Pipeline (Jenkins)
-
-The Jenkinsfile automates the entire build-to-deploy flow:
-
-| # | Stage | Description |
-|---|-------|-------------|
-| 1 | **Checkout Code** | Clone this repo (main branch) |
-| 2 | **Build & Scan & Push** | Build Docker image → Trivy vulnerability scan (CRITICAL/HIGH) → Push to DockerHub |
-| 3 | **Update GitOps Repo** | Clone `gitops-prod` → Update `canary.yaml` image tag → Commit & push |
-| 4 | **Cleanup** | Remove local Docker image |
-
-### Key Details
-
-- **Image naming:** `ashrith2727/gitops:<BUILD_NUMBER>`
-- **Security scanning:** Trivy blocks builds with CRITICAL or HIGH vulnerabilities (exit-code 1)
-- **GitOps update:** Only `environments/develop/canary.yaml` is auto-updated — staging and production require manual promotion
-- **Credentials:** DockerHub (`dockerhub`) and GitHub (`github`) credentials stored in Jenkins
-
-### Deployment Flow After CI
-
-```
-CI auto-updates canary.yaml (1 replica, develop namespace)
-    ↓
-Canary validated in develop
-    ↓
-Manually update deployment.yaml in develop (promote to stable)
-    ↓
-Manually update staging/deployment.yaml (promote to staging)
-    ↓
-Manually update production/deployment.yaml (promote to production)
-```
+### Admin (Requires Admin Role)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/admin/requests` | List all requests (filter by status) |
+| `GET` | `/admin/requests/{id}` | Get request details |
+| `POST` | `/admin/approve/{id}` | Approve a request |
+| `POST` | `/admin/reject/{id}` | Reject a request |
 
 ---
 
 ## Running Locally
 
 ```bash
-cd app
-npm install
-node app.js
-# App runs on http://localhost:3000
+# Start all services
+docker compose up -d
+
+# Services:
+#   PostgreSQL  → localhost:5434
+#   Backend API → localhost:8001 (Swagger docs at /docs)
+#   Frontend UI → localhost:4000
 ```
 
-### Docker
+### First-Time Setup
 
-```bash
-docker build -t gitops-demo:local app/
-docker run -p 3000:3000 gitops-demo:local
-```
+1. Open `http://localhost:4000` and register an account
+2. Promote your user to admin:
+   ```bash
+   docker exec postgres-gitops psql -U krishna -d postgresdb \
+     -c "UPDATE users SET role='admin' WHERE username='YOUR_USERNAME';"
+   ```
+3. Log out and log back in to get admin access
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 19, Vite, React Router |
+| Backend | FastAPI, SQLAlchemy, Pydantic |
+| Database | PostgreSQL 16 |
+| Auth | JWT (PyJWT), bcrypt |
+| Proxy | Nginx |
+| Container | Docker, Docker Compose |
