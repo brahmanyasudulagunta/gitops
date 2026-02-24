@@ -1,0 +1,523 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ── Reset & Base ── */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background-color: #0d1117;
+  color: #e6edf3;
+  line-height: 1.6;
+}
+
+/* ── Layout ── */
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
+  padding: 0 32px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-brand h1 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #f0f6fc;
+  letter-spacing: -0.3px;
+}
+
+.header-nav {
+  display: flex;
+  gap: 4px;
+}
+
+.header-nav a {
+  text-decoration: none;
+  color: #8b949e;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: color 0.2s, background 0.2s;
+}
+
+.header-nav a:hover {
+  color: #e6edf3;
+  background: #21262d;
+}
+
+.header-nav a.active {
+  color: #f0f6fc;
+  background: #1f6feb;
+}
+
+.admin-link.active {
+  background: #da3633 !important;
+}
+
+.main-content {
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 24px;
+  flex: 1;
+}
+
+/* ── Page Header ── */
+.page-header {
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.page-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #f0f6fc;
+}
+
+.subtitle {
+  color: #8b949e;
+  font-size: 14px;
+  width: 100%;
+}
+
+/* ── Card ── */
+.card {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 16px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: #8b949e;
+}
+
+/* ── Forms ── */
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: #8b949e;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+input {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #e6edf3;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+input:focus {
+  outline: none;
+  border-color: #1f6feb;
+}
+
+input::placeholder {
+  color: #484f58;
+}
+
+/* ── Buttons ── */
+button {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background: #1f6feb;
+  color: #fff;
+  width: 100%;
+}
+
+.btn-primary:hover {
+  background: #388bfd;
+}
+
+.btn-approve {
+  background: #238636;
+  color: #fff;
+  padding: 6px 14px;
+  font-size: 13px;
+  margin-right: 8px;
+}
+
+.btn-approve:hover {
+  background: #2ea043;
+}
+
+.btn-reject {
+  background: #da3633;
+  color: #fff;
+  padding: 6px 14px;
+  font-size: 13px;
+}
+
+.btn-reject:hover {
+  background: #f85149;
+}
+
+.btn-back {
+  background: transparent;
+  color: #8b949e;
+  padding: 10px 0;
+  margin-top: 16px;
+}
+
+.btn-back:hover {
+  color: #e6edf3;
+}
+
+/* ── Status Badges ── */
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-pending {
+  background: rgba(210, 153, 34, 0.15);
+  color: #d29922;
+  border: 1px solid rgba(210, 153, 34, 0.3);
+}
+
+.badge-approved {
+  background: rgba(35, 134, 54, 0.15);
+  color: #3fb950;
+  border: 1px solid rgba(35, 134, 54, 0.3);
+}
+
+.badge-rejected {
+  background: rgba(218, 54, 51, 0.15);
+  color: #f85149;
+  border: 1px solid rgba(218, 54, 51, 0.3);
+}
+
+/* ── Tables ── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: #8b949e;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #30363d;
+}
+
+tbody td {
+  padding: 14px 16px;
+  font-size: 14px;
+  border-bottom: 1px solid #21262d;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.clickable-row {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.clickable-row:hover {
+  background: #1c2128;
+}
+
+.type-cell {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 13px;
+  color: #79c0ff;
+}
+
+.payload-cell {
+  color: #8b949e;
+  font-size: 13px;
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.date-cell {
+  color: #8b949e;
+  font-size: 13px;
+}
+
+.actions-cell {
+  white-space: nowrap;
+}
+
+/* ── Filter Tabs ── */
+.filter-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.filter-btn {
+  background: transparent;
+  color: #8b949e;
+  padding: 8px 16px;
+  border: 1px solid #30363d;
+  font-size: 13px;
+}
+
+.filter-btn:hover {
+  color: #e6edf3;
+  background: #21262d;
+}
+
+.filter-btn.active {
+  color: #f0f6fc;
+  background: #1f6feb;
+  border-color: #1f6feb;
+}
+
+/* ── Request Detail ── */
+.detail-card {
+  padding: 32px;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 12px 24px;
+  margin-bottom: 24px;
+}
+
+.detail-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #8b949e;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detail-value {
+  font-size: 14px;
+  color: #e6edf3;
+}
+
+.payload-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #f0f6fc;
+  margin-bottom: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #30363d;
+}
+
+.payload-grid {
+  margin-bottom: 24px;
+}
+
+.payload-row {
+  display: flex;
+  padding: 8px 0;
+  border-bottom: 1px solid #21262d;
+}
+
+.payload-row:last-child {
+  border-bottom: none;
+}
+
+.payload-key {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 13px;
+  color: #79c0ff;
+  min-width: 140px;
+}
+
+.payload-value {
+  font-size: 14px;
+  color: #e6edf3;
+}
+
+.detail-actions {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #30363d;
+}
+
+.action-status {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #3fb950;
+}
+
+/* ── Status Message (Forms) ── */
+.status-message {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+}
+
+.status-message p {
+  font-size: 14px;
+}
+
+.request-id {
+  margin-top: 4px;
+  color: #8b949e;
+  font-size: 13px;
+}
+
+.request-id strong {
+  color: #79c0ff;
+}
+
+.link {
+  color: #1f6feb;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.link:hover {
+  color: #388bfd;
+}
+
+/* ── Auth Pages ── */
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0d1117;
+  padding: 24px;
+}
+
+.auth-card {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  padding: 40px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.auth-header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #f0f6fc;
+  margin-bottom: 8px;
+}
+
+.auth-header p {
+  color: #8b949e;
+  font-size: 14px;
+}
+
+.auth-error {
+  background: rgba(218, 54, 51, 0.1);
+  border: 1px solid rgba(218, 54, 51, 0.3);
+  color: #f85149;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 20px;
+  color: #8b949e;
+  font-size: 14px;
+}
+
+.auth-footer a {
+  color: #1f6feb;
+  text-decoration: none;
+}
+
+.auth-footer a:hover {
+  color: #388bfd;
+  text-decoration: underline;
+}
+
+/* ── Header User Section ── */
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: 16px;
+  padding-left: 16px;
+  border-left: 1px solid #30363d;
+}
+
+.username {
+  color: #8b949e;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.btn-logout {
+  background: transparent;
+  color: #8b949e;
+  border: 1px solid #30363d;
+  padding: 5px 12px;
+  font-size: 12px;
+}
+
+.btn-logout:hover {
+  color: #f85149;
+  border-color: #f85149;
+}
