@@ -17,10 +17,15 @@ export default function Layout({ children }) {
           <h1>Platform Control Plane</h1>
         </div>
         <nav className="header-nav">
-          <NavLink to="/" end>Dashboard</NavLink>
-          <NavLink to="/namespace">Namespace</NavLink>
-          <NavLink to="/argocd">ArgoCD</NavLink>
-          {isAdmin() && <NavLink to="/admin" className="admin-link">Admin</NavLink>}
+          {!isAdmin() ? (
+            <>
+              <NavLink to="/" end>Dashboard</NavLink>
+              <NavLink to="/namespace">Namespace</NavLink>
+              <NavLink to="/argocd">ArgoCD</NavLink>
+            </>
+          ) : (
+            <NavLink to="/admin" className="admin-link">Admin Dashboard</NavLink>
+          )}
           <div className="header-user">
             <span className="username">{user?.username}</span>
             <button className="btn-logout" onClick={handleLogout}>Logout</button>

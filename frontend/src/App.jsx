@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -9,6 +9,15 @@ import DevPlatform from "./pages/DevPlatform";
 import ArgoCD from "./pages/ArgoCD";
 import AdminDashboard from "./pages/AdminDashboard";
 import RequestDetail from "./pages/RequestDetail";
+import { useAuth } from "./context/AuthContext";
+
+function RootRedirect() {
+  const { isAdmin } = useAuth();
+  if (isAdmin()) {
+    return <Navigate to="/admin" replace />;
+  }
+  return <Dashboard />;
+}
 
 export default function App() {
   return (
@@ -22,7 +31,9 @@ export default function App() {
             path="/"
             element={
               <ProtectedRoute>
-                <Layout><Dashboard /></Layout>
+                <Layout>
+                  <RootRedirect />
+                </Layout>
               </ProtectedRoute>
             }
           />
